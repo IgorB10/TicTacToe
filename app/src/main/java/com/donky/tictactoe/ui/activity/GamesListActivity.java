@@ -7,7 +7,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.donky.tictactoe.R;
+import com.donky.tictactoe.tictactoe.GameManager;
+import com.donky.tictactoe.tictactoe.GameSession;
 import com.donky.tictactoe.ui.dialog.AddGameDialog;
+import com.donky.tictactoe.ui.fragment.GamesListFragment;
 
 import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
@@ -24,63 +27,34 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class GamesListActivity extends AppCompatActivity implements AddGameDialog.OnUserInviteListener {
+public class GamesListActivity extends AppCompatActivity implements AddGameDialog.OnUserInviteListener{
+
+    private GamesListFragment mGamesListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.games_list_activity);
-
-
+        mGamesListFragment = (GamesListFragment)getFragmentManager().findFragmentById(R.id.game_listfragment);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void sendInvite(String userId) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("kingMove", "A1 - B4");
-        }catch (JSONException e){
-            e.printStackTrace();
-        }
-
-        ContentNotification contentNotification =
-                new ContentNotification("test_device_1", "chessMove", jsonObject);
-
-        DonkyNetworkController.getInstance().sendContentNotification(
-                contentNotification,
-                new DonkyListener(){
-                    @Override
-                    public void success() {
-//                        Toast.makeText(GamesListActivity.this, "success", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void error(DonkyException e, Map<String, String> map) {
-                        Toast.makeText(GamesListActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+       mGamesListFragment.sendInvite(userId);
     }
 }

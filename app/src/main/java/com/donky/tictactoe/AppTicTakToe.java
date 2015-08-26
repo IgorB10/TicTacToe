@@ -61,28 +61,6 @@ public class AppTicTakToe extends Application {
                 }
         );
 
-    NotificationListener<ServerNotification> listener =
-            new NotificationListener<ServerNotification>() {
-
-                @Override
-                public void onNotification(ServerNotification notification) {
-                    Toast.makeText(AppTicTakToe.this, notification.getId() + " " + notification.getData().toString(), Toast.LENGTH_LONG).show();
-
-                      /* Code to handle the notification(s) as they are received and
-                      processed */
-
-                }
-
-            };
-
-    // Create Subscription to receive the 'chessMove' custom type.
-    Subscription<ServerNotification> subscription =
-            new Subscription<>("chessMove", listener);
-
-    //Subscribe module definition and above subscription with the Donky Core
-    DonkyCore.subscribeToContentNotifications(
-            new ModuleDefinition("Chess Game", "1.0.0.0"), subscription
-    );
     }
 
 }
