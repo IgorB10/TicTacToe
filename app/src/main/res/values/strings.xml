@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TicTacToe</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="user_id">User ID</string>
+    <string name="display_name">Display Name</string>
+    <string name="login">Login</string>
+    <string name="ServiceURL">https://dev-client-api.mobiledonky.com</string>
+    <string name="challenge_user">Who do you want do challenge ?</string>
+    <string name="send_invite">Send Invite</string>
+    <string name="cancel">Cancel</string>
+    <!--<string name="ServiceURL">https://client-api.mobiledonky.com</string>-->
+</resources>

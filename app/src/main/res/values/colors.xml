@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fab_color">#4A148C</color>
+
+    <color name="fab_output">#8E24AA</color>
+
+
+    <!--Grey colors-->
+    <color name="mine_shaft">#333333</color>
+    <color name="ship_gray">#414042</color>
+    <color name="dove_gray">#666666</color>
+    <color name="dusty_gray">#999999</color>
+    <color name="alto">#d9d9d9</color>
+    <color name="concrete">#f2f2f2</color>
+    <color name="white">#ffffff</color>
+</resources>
