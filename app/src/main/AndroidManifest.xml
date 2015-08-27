@@ -15,6 +15,7 @@
         <activity
             android:name=".ui.activity.LoginActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateVisible|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,8 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.GamesListActivity"/>
-        <activity android:name=".ui.activity.TicTakToeActivity"/>
+        <activity android:name=".ui.activity.GamesActivity"
+                  android:screenOrientation="portrait" />
     </application>
 
 </manifest>

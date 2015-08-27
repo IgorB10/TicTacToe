@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.donky.tictactoe.R;
+import com.donky.tictactoe.model.Invite;
 
 public class AddGameDialog extends DialogFragment {
 
@@ -41,5 +42,7 @@ public class AddGameDialog extends DialogFragment {
 
     public interface OnUserInviteListener{
         void sendInvite(String userId);
+        void acceptInvite(Invite invite);
+        void declineInvite(Invite invite);
     }
 }

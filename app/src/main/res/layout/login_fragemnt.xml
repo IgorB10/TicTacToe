@@ -7,10 +7,12 @@
     android:padding="@dimen/default_padding">
 
     <LinearLayout
+        android:id="@+id/login_content"
         android:layout_width="match_parent"
         android:layout_weight="1"
         android:layout_height="0dp"
         android:gravity="center"
+        android:visibility="invisible"
         android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout

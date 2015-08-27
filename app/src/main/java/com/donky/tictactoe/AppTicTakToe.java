@@ -8,6 +8,7 @@ import com.donky.tictactoe.controllers.RegistrationController;
 import com.donky.tictactoe.model.User;
 import com.donky.tictactoe.network.CallBack;
 import com.donky.tictactoe.ui.AppDonkyListener;
+import com.donky.tictactoe.utill.PreferencesManager;
 
 import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
@@ -26,23 +27,31 @@ public class AppTicTakToe extends Application {
     private final String KEY = "xbtdB9hdea4mJ5AKbKyGV7QA+ZtodIcG18zECr62ZFKjgHjNbPMR9rpUPCfpbYKjNS1FL7OAncGdnee3zw";
 
     private static AppTicTakToe sAppTicTakToe;
-    private RegistrationController mRegistrationController;
+    private PreferencesManager sPreferencesManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         sAppTicTakToe = this;
-        mRegistrationController = new RegistrationController();
+        sPreferencesManager = new PreferencesManager(this);
     }
 
     public static AppTicTakToe getsAppTicTakToe() {
         return sAppTicTakToe;
     }
 
+    public PreferencesManager getPreferencesManager() {
+        return sPreferencesManager;
+    }
+
     public void initDonkyModel(User user, final CallBack callBack) {
         UserDetails userDetails = new UserDetails();
         userDetails.setUserId(user.getUserId()).setUserDisplayName(user.getDisplayName());
         DeviceDetails deviceDetails = new DeviceDetails("my Nexus", "Nexus", null);
+        Subscription<ServerNotification> subscription =
+                new Subscription<>("invite", NotificationManager.getInstance());
+        DonkyCore.subscribeToContentNotifications(
+                new ModuleDefinition("Chess Game", "1.0.0.0"), subscription);
         DonkyCore.initialiseDonkySDK(this,
                 KEY,
                 userDetails,
@@ -60,6 +69,8 @@ public class AppTicTakToe extends Application {
                     }
                 }
         );
+
+
 
     }
 

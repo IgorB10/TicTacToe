@@ -2,98 +2,99 @@ package com.donky.tictactoe.tictactoe;
 
 import android.widget.Toast;
 
-import net.donky.core.DonkyCore;
+import java.util.ArrayList;
+import java.util.Map;
+
+import com.donky.tictactoe.AppTicTakToe;
+import com.donky.tictactoe.NotificationManager;
+import com.donky.tictactoe.model.Invite;
+import com.donky.tictactoe.model.Move;
+import com.donky.tictactoe.ui.view.GameView.State;
+import com.donky.tictactoe.utill.Constants;
+import com.google.gson.Gson;
+
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
-import net.donky.core.ModuleDefinition;
-import net.donky.core.NotificationListener;
-import net.donky.core.Subscription;
 import net.donky.core.network.DonkyNetworkController;
-import net.donky.core.network.ServerNotification;
 import net.donky.core.network.content.ContentNotification;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Map;
+public class GameSession implements GameMoves{
 
-public class GameSession implements GameMoves, NotificationListener<ServerNotification> {
+    private Invite mInvite;
+    private State[] states;
 
-    private final String mId;
-    private ArrayList<Move> moves;
-
-    public GameSession(String id){
-        mId = id;
-        moves = defaultMoves();
-        Subscription<ServerNotification> subscription =
-                new Subscription<>("chessMove", this);
-        DonkyCore.subscribeToContentNotifications(
-                new ModuleDefinition("Chess Game", "1.0.0.0"), subscription
-        );
-    }
-
-    public ArrayList<Move> getMoves() {
-        return moves;
-    }
-
-    public void setMoves(ArrayList<Move> moves) {
-        this.moves = moves;
+    public GameSession(Invite invite){
+        mInvite = invite;
+        initStates();
+        NotificationManager.getInstance().addListener(Constants.GAME + invite.getGameId(), new NotificationManager.OnNotificationListener<Move>() {
+            @Override
+            public void notifyObservers(Move move) {
+                receive(move);
+            }
+        });
     }
 
     @Override
     public void move(Move move) {
-
+        sendMove(move);
     }
 
     @Override
     public void receive(Move move) {
-
+        states[move.getPosition()] = State.PLAYER2;
     }
 
-    @Override
-    public void onNotification(ServerNotification serverNotification) {
-
+    public Invite getmInvite() {
+        return mInvite;
     }
 
-    private void sendMove(Move move){
-        JSONObject jsonObject = new JSONObject();
+    public void setmInvite(Invite mInvite) {
+        this.mInvite = mInvite;
+    }
+
+    public State[] getStates() {
+        return states;
+    }
+
+    public void setStates(State[] states) {
+        this.states = states;
+    }
+
+    private void sendMove(final Move move){
+        String jsonString = new Gson().toJson(move);
+        JSONObject jsonObject = null;
         try {
-            jsonObject.put("kingMove", "A1 - B4");
+            jsonObject = new JSONObject(jsonString);
         }catch (JSONException e){
             e.printStackTrace();
         }
-
         ContentNotification contentNotification =
-                new ContentNotification("test_device_1", "chessMove", jsonObject);
+                new ContentNotification(mInvite.getToUserId(), Constants.INVITE, jsonObject);
 
         DonkyNetworkController.getInstance().sendContentNotification(
                 contentNotification,
                 new DonkyListener(){
                     @Override
                     public void success() {
-//                        Toast.makeText(GamesListActivity.this, "success", Toast.LENGTH_LONG).show();
+                        states[move.getPosition()] = State.PLAYER1;
+                        Toast.makeText(AppTicTakToe.getsAppTicTakToe(), "success move", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void error(DonkyException e, Map<String, String> map) {
-//                        Toast.makeText(GamesListActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(AppTicTakToe.getsAppTicTakToe(), e.getMessage(), Toast.LENGTH_LONG).show();
                     }
-            });
+                });
     }
 
-    public ArrayList<Move> defaultMoves(){
-        ArrayList<Move> moves = new ArrayList<>(9);
-        moves.add(new Move());
-        moves.add(new Move());
-        moves.add(new Move());
-        moves.add(new Move());
-        moves.add(new Move());
-        moves.add(new Move());
-        moves.add(new Move());
-        moves.add(new Move());
-        moves.add(new Move());
-        return moves;
+    public void initStates(){
+        states = new State[9];
+        for (int i = 0; i < states.length; i++) {
+            states[i] = State.EMPTY;
+        }
     }
 
 }
