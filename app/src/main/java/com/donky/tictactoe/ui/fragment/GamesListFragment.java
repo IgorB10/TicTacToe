@@ -110,7 +110,7 @@ public class GamesListFragment extends BaseFragment {
                 convertView.setTag(viewHolder);
             }
             final GameSession session = getItem(position);
-            viewHolder.content.setText(session.getmInvite().getFromUserId());
+            viewHolder.content.setText(session.getmInvite().getOpponetUserId());
             return convertView;
         }
     }

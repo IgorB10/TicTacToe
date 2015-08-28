@@ -15,8 +15,11 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.donky.tictactoe.R;
+import com.donky.tictactoe.model.Move;
+import com.donky.tictactoe.tictactoe.Game;
+import com.donky.tictactoe.tictactoe.GameSession;
 
-public class GameView extends View {
+public class GameView extends View  implements Game {
 
     private Bitmap mPlayer1;
     private Bitmap mPlayer2;
@@ -39,11 +42,60 @@ public class GameView extends View {
     private Paint mLinePaint;
     private Paint mBmpPaint;
 
-    private State[] mDataStates = new State[9];
+    private State[] mDataStates;
 
     private final Rect mSrcRect = new Rect();
     private final Rect mDstRect = new Rect();
 
+
+    @Override
+    public void onStartGame(State[] states) {
+        mDataStates = states;
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        invalidate();
+    }
+
+    @Override
+    public GameSession getSession() {
+        return null;
+    }
+
+    @Override
+    public void onPauseGame() {
+
+    }
+
+    @Override
+    public void onStopGame() {
+
+    }
+
+    @Override
+    public void onFinishGame() {
+
+    }
+
+    @Override
+    public void onMoveMade(Move move) {
+        setCell(move.getPosition(), State.PLAYER2);
+    }
+
+    @Override
+    public State getCurrentState() {
+        return mCurrentPlayer;
+    }
+
+    @Override
+    public void setOnCellSelectedListener(OnCellSelectedListener listener) {
+        mCellSelectedListener = listener;
+    }
+
+    @Override
+    public void setCurrentPlayer(State player) {
+        mCurrentPlayer = player;
+        mSelectedCell = -1;
+    }
 
     public enum State {
         UNKNOWN(-3),
@@ -108,15 +160,6 @@ public class GameView extends View {
         mWinPaint.setStrokeWidth(10);
         mWinPaint.setStyle(Paint.Style.STROKE);
 
-    }
-
-    public void setStates(State[] states){
-        mDataStates = states;
-        invalidate();
-    }
-
-    public void update(){
-        invalidate();
     }
 
     @Override
@@ -311,9 +354,9 @@ public class GameView extends View {
         invalidate();
     }
 
-    public void setCellListener(OnCellSelectedListener cellListener) {
-        mCellSelectedListener = cellListener;
-    }
+//    public void setCellListener(OnCellSelectedListener cellListener) {
+//        mCellSelectedListener = cellListener;
+//    }
 
     public int getSelection() {
         if (mSelectedValue == mCurrentPlayer) {
@@ -323,14 +366,14 @@ public class GameView extends View {
         return -1;
     }
 
-    public State getCurrentPlayer() {
-        return mCurrentPlayer;
-    }
+//    public State getCurrentPlayer() {
+//        return mCurrentPlayer;
+//    }
 
-    public void setCurrentPlayer(State player) {
-        mCurrentPlayer = player;
-        mSelectedCell = -1;
-    }
+//    public void setCurrentPlayer(State player) {
+//        mCurrentPlayer = player;
+//        mSelectedCell = -1;
+//    }
 
     public State getWinner() {
         return mWinner;

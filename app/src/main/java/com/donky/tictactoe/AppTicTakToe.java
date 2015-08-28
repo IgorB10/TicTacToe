@@ -49,14 +49,10 @@ public class AppTicTakToe extends Application {
         UserDetails userDetails = new UserDetails();
         userDetails.setUserId(user.getUserId()).setUserDisplayName(user.getDisplayName());
         DeviceDetails deviceDetails = new DeviceDetails("my Nexus", "Nexus", null);
-        Subscription<ServerNotification> subscriptionInvites =
+        ModuleDefinition moduleDefinition = new ModuleDefinition("TicTakToe Game", "1.0.0.0");
+        Subscription<ServerNotification> subscription =
                 new Subscription<>(Constants.INVITE, NotificationManager.getInstance());
-        Subscription<ServerNotification> subscriptionMoves =
-                new Subscription<>(Constants.MOVE, NotificationManager.getInstance());
-        DonkyCore.subscribeToContentNotifications(
-                new ModuleDefinition("TicTakToe Game", "1.0.0.0"), subscriptionInvites);
-        DonkyCore.subscribeToContentNotifications(
-                new ModuleDefinition("TicTakToe Game", "1.0.0.0"), subscriptionMoves);
+        DonkyCore.subscribeToContentNotifications(moduleDefinition, subscription);
         DonkyCore.initialiseDonkySDK(this,
                 KEY,
                 userDetails,

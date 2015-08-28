@@ -55,15 +55,8 @@ public class NotificationManager implements NotificationListener<ServerNotificat
         JsonObject data = serverNotification.getData();
         String type = data.get("customType").getAsString();
         Gson gson = new GsonBuilder().create();
-        //FIXME
-        if (type.equals(Constants.INVITE)) {
-            Invite invite = gson.fromJson(data.get("customData"), Invite.class);
-            for (OnNotificationListener listener : mNotificationMap.get(type))
-                listener.notifyObservers(invite);
-        } else if (type.equals(Constants.MOVE)){
-            Move move = gson.fromJson(data.get("customData"), Move.class);
-            for (OnNotificationListener listener : mNotificationMap.get(type))
-                listener.notifyObservers(move);
-        }
+        Invite invite = gson.fromJson(data.get("customData"), Invite.class);
+        for (OnNotificationListener listener : mNotificationMap.get(type))
+            listener.notifyObservers(invite);
     }
 }

@@ -23,8 +23,10 @@ public class GamesActivity extends Activity implements AddGameDialog.OnUserInvit
                                                                 GameManager.Game,
                                                                 GamesListFragment.OnSessionSelectedListener {
 
+    public static String EXTRA_SELECTED_SESION = "session";
+
     private GamesListFragment mGamesListFragment;
-    private GameManager mGameManager;
+    public GameManager mGameManager;
     private GameFragment mGameFragment;
 
 
@@ -118,20 +120,16 @@ public class GamesActivity extends Activity implements AddGameDialog.OnUserInvit
     public void sessionPosition(int position) {
         if (mGameFragment == null)
             mGameFragment = new GameFragment();
-        this.position = position;
         //FIXME
-        GameSession session = mGameManager.getGameSession(position);
-        session.setGameFragment(mGameFragment);
-        mGameFragment.setGameSession(session);
-
+        Bundle bundle = new Bundle();
+        bundle.putInt(EXTRA_SELECTED_SESION, position);
+        mGameFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction
                 .replace(R.id.content, mGameFragment, "GameFragment")
                 .addToBackStack("mGamesListFragment_GameFragment")
                 .commit();
     }
-
-    int position;
 
     @Override
     public void onBackPressed() {

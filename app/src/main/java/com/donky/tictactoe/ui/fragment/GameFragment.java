@@ -13,13 +13,16 @@ import android.widget.TextView;
 
 import com.donky.tictactoe.R;
 import com.donky.tictactoe.model.Move;
+import com.donky.tictactoe.tictactoe.Game;
 import com.donky.tictactoe.tictactoe.GameMoves;
 import com.donky.tictactoe.tictactoe.GameSession;
+import com.donky.tictactoe.ui.activity.GamesActivity;
 import com.donky.tictactoe.ui.view.GameView;
 
 import java.util.Random;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 
 public class GameFragment extends BaseFragment {
 
@@ -30,12 +33,9 @@ public class GameFragment extends BaseFragment {
     private static final int MSG_COMPUTER_TURN = 1;
     private static final long COMPUTER_DELAY_MS = 500;
 
-    private Handler mHandler = new Handler(new MyHandlerCallback());
-    private Random mRnd = new Random();
-
     private GameSession mGameSession;
 
-    @Bind(R.id.game_view) GameView mGameView;
+    @Bind(R.id.game_view) Game mGameView;
     @Bind(R.id.info_turn) TextView mInfoView;
     @Bind(R.id.next_turn) Button mButtonNext;
 
@@ -43,12 +43,22 @@ public class GameFragment extends BaseFragment {
         GameSession currentSession();
     }
 
+    @OnClick(R.id.next_turn)
+    public void finishGame(){
+        super.getActivity().onBackPressed();
+    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 //        if (activity instanceof OnGameSession)
 //            mGameSession = ((OnGameSession) activity).currentSession();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Nullable
@@ -60,10 +70,11 @@ public class GameFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mGameView.setFocusable(true);
-        mGameView.setFocusableInTouchMode(true);
-        mGameView.setCellListener(new MyCellListener());
-        mGameView.setStates(mGameSession.getStates());
+        int position = getArguments().getInt(GamesActivity.EXTRA_SELECTED_SESION);
+        mGameSession = ((GamesActivity)getActivity()).mGameManager.getGameSession(position);
+        mGameSession.setGameFragment(this);
+        mGameView.onStartGame(mGameSession.getStates());
+        mGameView.setOnCellSelectedListener(new MyCellListener());
         mGameSession.setGameMoves(new GameMoves() {
             @Override
             public void move(Move move) {
@@ -72,7 +83,7 @@ public class GameFragment extends BaseFragment {
 
             @Override
             public void receive(Move move) {
-                mGameView.update();
+                mGameView.onMoveMade(move);
                 selectTurn(GameView.State.PLAYER2);
                 finishTurn();
             }
@@ -84,23 +95,19 @@ public class GameFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
 
-        GameView.State player = mGameView.getCurrentPlayer();
+        GameView.State player = mGameView.getCurrentState();
         if (player == GameView.State.UNKNOWN) {
             player = GameView.State.fromInt(getActivity().getIntent().getIntExtra(EXTRA_START_PLAYER, 1));
             if (!checkGameFinished(player)) {
                 selectTurn(player);
             }
         }
-        if (player == GameView.State.PLAYER2) {
-            mHandler.sendEmptyMessageDelayed(MSG_COMPUTER_TURN, COMPUTER_DELAY_MS);
-        }
+//        if (player == GameView.State.PLAYER2) {
+//            mHandler.sendEmptyMessageDelayed(MSG_COMPUTER_TURN, COMPUTER_DELAY_MS);
+//        }
         if (player == GameView.State.WIN) {
-            setWinState(mGameView.getWinner());
+            setWinState(mGameView.getCurrentState());
         }
-    }
-
-    public void setGameSession(GameSession session){
-        mGameSession = session;
     }
 
     private GameView.State selectTurn(GameView.State player) {
@@ -121,7 +128,7 @@ public class GameFragment extends BaseFragment {
 
     private class MyCellListener implements GameView.OnCellSelectedListener {
         public void onCellSelected() {
-            GameView.State player = mGameView.getCurrentPlayer();
+            GameView.State player = mGameView.getCurrentState();
             if (player == GameView.State.WIN) {
                getActivity().finish();
             } else if (player == GameView.State.PLAYER1) {
@@ -141,37 +148,37 @@ public class GameFragment extends BaseFragment {
         }
     }
 
-    private class MyHandlerCallback implements Handler.Callback {
-        public boolean handleMessage(Message msg) {
-            if (msg.what == MSG_COMPUTER_TURN) {
-
-                // Pick a non-used cell at random. That's about all the AI you need for this game.
-                GameView.State[] data = mGameView.getDataStates();
-                int used = 0;
-                while (used != 0x1F) {
-                    int index = mRnd.nextInt(9);
-                    if (((used >> index) & 1) == 0) {
-                        used |= 1 << index;
-                        if (data[index] == GameView.State.EMPTY) {
-                            mGameView.setCell(index, mGameView.getCurrentPlayer());
-                            break;
-                        }
-                    }
-                }
+//    private class MyHandlerCallback implements Handler.Callback {
+//        public boolean handleMessage(Message msg) {
+//            if (msg.what == MSG_COMPUTER_TURN) {
+//
+//                // Pick a non-used cell at random. That's about all the AI you need for this game.
+//                GameView.State[] data = mGameView.getDataStates();
+//                int used = 0;
+//                while (used != 0x1F) {
+//                    int index = mRnd.nextInt(9);
+//                    if (((used >> index) & 1) == 0) {
+//                        used |= 1 << index;
+//                        if (data[index] == GameView.State.EMPTY) {
+//                            mGameView.setCell(index, mGameView.getCurrentPlayer());
+//                            break;
+//                        }
+//                    }
+//                }
 
 //                finishTurn();
-                return true;
-            }
-            return false;
-        }
-    }
+//                return true;
+//            }
+//            return false;
+//        }
+//    }
 
     private GameView.State getOtherPlayer(GameView.State player) {
         return player == GameView.State.PLAYER1 ? GameView.State.PLAYER2 : GameView.State.PLAYER1;
     }
 
     private void finishTurn() {
-        GameView.State player = mGameView.getCurrentPlayer();
+        GameView.State player = mGameView.getCurrentState();
         if (!checkGameFinished(player)) {
             player = selectTurn(getOtherPlayer(player));
 //            if (player == GameView.State.PLAYER2) {
@@ -181,7 +188,7 @@ public class GameFragment extends BaseFragment {
     }
 
     public boolean checkGameFinished(GameView.State player) {
-        GameView.State[] data = mGameView.getDataStates();
+        GameView.State[] data = mGameSession.getStates();
         boolean full = true;
 
         int col = -1;

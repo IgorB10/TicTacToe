@@ -20,25 +20,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 
-public class GameManager {
+public class GameManager implements NotificationManager.OnNotificationListener<Invite>{
 
     private ArrayList<GameSession> mGameSessions;
     private Game mGame;
     private ArrayList<Invite> mSendInvited;
     private Random random = new Random();
-
-    private NotificationManager.OnNotificationListener<Invite> mNotificationListener = new NotificationManager.OnNotificationListener<Invite>() {
-        @Override
-        public void notifyObservers(Invite invite) {
-            if (mSendInvited.contains(invite)) {
-                createGameSession(invite);
-            }else if (Constants.PROPOSE.equals(invite.getState())){
-                mGame.onInviteReceived(invite);
-            }else if (Constants.DECLINE.equals(invite.getState())){
-                mSendInvited.remove(invite);
-            }
-        }
-    };
 
     public GameManager(Game game) {
         mGame = game;
@@ -46,12 +33,23 @@ public class GameManager {
         mGameSessions = new ArrayList<>();
     }
 
+    @Override
+    public void notifyObservers(Invite invite) {
+        if (mSendInvited.contains(invite)) {
+            createGameSession(invite);
+        }else if (Constants.PROPOSE.equals(invite.getState())){
+            mGame.onInviteReceived(invite);
+        }else if (Constants.DECLINE.equals(invite.getState())){
+            mSendInvited.remove(invite);
+        }
+    }
+
     public void addListeners(){
-        NotificationManager.getInstance().addListener(Constants.INVITE, mNotificationListener);
+        NotificationManager.getInstance().addListener(Constants.INVITE, this);
     }
 
     public void removeListeners(){
-        NotificationManager.getInstance().removeListener(Constants.INVITE, mNotificationListener);
+        NotificationManager.getInstance().removeListener(Constants.INVITE, this);
     }
 
     private void createGameSession(Invite invite){
@@ -61,22 +59,9 @@ public class GameManager {
         mGame.onCreateGame(gameSession);
     }
 
-
     public void acceptInvite(Invite invite){
         sendInvite(invite, false);
         createGameSession(invite);
-    }
-
-    public void declineInvite(Invite invite){
-        mSendInvited.remove(invite);
-    }
-
-    public GameSession getGameSession(int position){
-        return mGameSessions.get(position);
-    }
-
-    public ArrayList<GameSession> getGameSessions() {
-        return mGameSessions;
     }
 
     public void sendInvite(String toUserId){
@@ -98,7 +83,7 @@ public class GameManager {
 
         DonkyNetworkController.getInstance().sendContentNotification(
                 contentNotification,
-                new DonkyListener(){
+                new DonkyListener() {
                     @Override
                     public void success() {
                         if (isSaveInvite)
@@ -112,6 +97,19 @@ public class GameManager {
                     }
                 });
     }
+
+    public void declineInvite(Invite invite){
+        mSendInvited.remove(invite);
+    }
+
+    public GameSession getGameSession(int position){
+        return mGameSessions.get(position);
+    }
+
+    public ArrayList<GameSession> getGameSessions() {
+        return mGameSessions;
+    }
+
 
     public interface Game{
 

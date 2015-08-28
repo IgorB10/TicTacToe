@@ -1,5 +1,6 @@
 package com.donky.tictactoe.tictactoe;
 
+import android.content.Intent;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -13,16 +14,23 @@ import com.donky.tictactoe.ui.fragment.GameFragment;
 import com.donky.tictactoe.ui.view.GameView.State;
 import com.donky.tictactoe.utill.Constants;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
+import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
+import net.donky.core.ModuleDefinition;
+import net.donky.core.NotificationListener;
+import net.donky.core.Subscription;
 import net.donky.core.network.DonkyNetworkController;
+import net.donky.core.network.ServerNotification;
 import net.donky.core.network.content.ContentNotification;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GameSession {
+public class GameSession implements NotificationListener<ServerNotification> {
 
     private Invite mInvite;
     private State[] states;
@@ -33,13 +41,23 @@ public class GameSession {
     public GameSession(Invite invite){
         mInvite = invite;
         initStates();
-        NotificationManager.getInstance().addListener(Constants.MOVE, new NotificationManager.OnNotificationListener<Move>() {
-            @Override
-            public void notifyObservers(Move move) {
-                states[move.getPosition()] = State.PLAYER2;
+        ModuleDefinition moduleDefinition = new ModuleDefinition("TicTakToe Game", "1.0.0.0");
+        Subscription subscription = new Subscription<>(AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId() + "_" + mInvite.getGameId(), this);
+        DonkyCore.subscribeToContentNotifications(moduleDefinition, subscription);
+    }
+
+    @Override
+    public void onNotification(ServerNotification serverNotification) {
+
+        JsonObject data = serverNotification.getData();
+        String type = data.get("customType").getAsString();
+        if ((AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId() + "_" + mInvite.getGameId()).equals(type)) {
+            Gson gson = new GsonBuilder().create();
+            Move move = gson.fromJson(data.get("customData"), Move.class);
+            states[move.getPosition()] = State.PLAYER2;
+            if (mGameMoves != null)
                 mGameMoves.receive(move);
-            }
-        });
+        }
     }
 
     public void setGameFragment(GameFragment gameFragment) {
@@ -86,7 +104,7 @@ public class GameSession {
             e.printStackTrace();
         }
         ContentNotification contentNotification =
-                new ContentNotification(mInvite.getOpponetUserId(), Constants.MOVE, jsonObject);
+                new ContentNotification(mInvite.getOpponetUserId(), mInvite.getOpponetUserId()+ "_" + mInvite.getGameId(), jsonObject);
 
         DonkyNetworkController.getInstance().sendContentNotification(
                 contentNotification,
