@@ -78,13 +78,13 @@ public class AppTicTakToe extends Application {
 
             @Override
             public void error(DonkyException e, Map<String, String> map) {
-                callBack.error(map.get("id"));
+                if (map != null) {
+                    callBack.error(map.get("id"));
+                }else if (e != null){
+                    callBack.error(e.getMessage());
+                }
             }
         });
-
-
-
-
     }
 
 }
