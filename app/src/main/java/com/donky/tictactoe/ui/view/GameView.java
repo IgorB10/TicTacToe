@@ -285,78 +285,10 @@ public class GameView extends View  implements Game {
         return false;
     }
 
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        Bundle b = new Bundle();
-
-        Parcelable s = super.onSaveInstanceState();
-        b.putParcelable("gv_super_state", s);
-
-        b.putBoolean("gv_en", isEnabled());
-
-        int[] data = new int[mDataStates.length];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = mDataStates[i].getValue();
-        }
-        b.putIntArray("gv_data", data);
-
-        b.putInt("gv_sel_cell", mSelectedCell);
-        b.putInt("gv_sel_val",  mSelectedValue.getValue());
-        b.putInt("gv_curr_play", mCurrentPlayer.getValue());
-        b.putInt("gv_winner", mWinner.getValue());
-
-        b.putInt("gv_win_col", mWinCol);
-        b.putInt("gv_win_row", mWinRow);
-        b.putInt("gv_win_diag", mWinDiag);
-
-        return b;
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-
-        if (!(state instanceof Bundle)) {
-            // Not supposed to happen.
-            super.onRestoreInstanceState(state);
-            return;
-        }
-
-        Bundle b = (Bundle) state;
-        Parcelable superState = b.getParcelable("gv_super_state");
-
-        setEnabled(b.getBoolean("gv_en", true));
-
-        int[] data = b.getIntArray("gv_data");
-        if (data != null && data.length == mDataStates.length) {
-            for (int i = 0; i < data.length; i++) {
-                mDataStates[i] = State.fromInt(data[i]);
-            }
-        }
-
-        mSelectedCell = b.getInt("gv_sel_cell", -1);
-        mSelectedValue = State.fromInt(b.getInt("gv_sel_val", State.EMPTY.getValue()));
-        mCurrentPlayer = State.fromInt(b.getInt("gv_curr_play", State.EMPTY.getValue()));
-        mWinner = State.fromInt(b.getInt("gv_winner", State.EMPTY.getValue()));
-
-        mWinCol = b.getInt("gv_win_col", -1);
-        mWinRow = b.getInt("gv_win_row", -1);
-        mWinDiag = b.getInt("gv_win_diag", -1);
-
-        super.onRestoreInstanceState(superState);
-    }
-
-    public State[] getDataStates() {
-        return mDataStates;
-    }
-
     public void setCell(int cellIndex, State value) {
         mDataStates[cellIndex] = value;
         invalidate();
     }
-
-//    public void setCellListener(OnCellSelectedListener cellListener) {
-//        mCellSelectedListener = cellListener;
-//    }
 
     public int getSelection() {
         if (mSelectedValue == mCurrentPlayer) {
@@ -365,15 +297,6 @@ public class GameView extends View  implements Game {
 
         return -1;
     }
-
-//    public State getCurrentPlayer() {
-//        return mCurrentPlayer;
-//    }
-
-//    public void setCurrentPlayer(State player) {
-//        mCurrentPlayer = player;
-//        mSelectedCell = -1;
-//    }
 
     public State getWinner() {
         return mWinner;

@@ -10,7 +10,7 @@ public class PreferencesManager {
 
     private static final String SHARED_PREFERENCES = "com.donky.tictactoe";
     private static final String KEY_USER_ID = "user_id";
-    private static final String KEY_DISPLAY_ID = "display_id";
+    private static final String KEY_DISPLAY_NAME = "display_name";
 
     private SharedPreferences mSharedPreferences;
 
@@ -27,12 +27,12 @@ public class PreferencesManager {
         mSharedPreferences.edit().putString(KEY_USER_ID, userId).commit();
     }
 
-    public String getDisplayId() {
-        return mSharedPreferences.getString(KEY_DISPLAY_ID, null);
+    public String getDisplayName() {
+        return mSharedPreferences.getString(KEY_DISPLAY_NAME, null);
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void setDisplayId(String displayId) {
-        mSharedPreferences.edit().putString(KEY_DISPLAY_ID, displayId).commit();
+    public void setDisplayName(String displayName) {
+        mSharedPreferences.edit().putString(KEY_DISPLAY_NAME, displayName).commit();
     }
 }

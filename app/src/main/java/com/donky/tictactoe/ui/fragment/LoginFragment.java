@@ -6,11 +6,11 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.donky.tictactoe.AppTicTakToe;
 import com.donky.tictactoe.R;
@@ -22,7 +22,6 @@ import butterknife.Bind;
 import butterknife.OnClick;
 
 public class LoginFragment extends BaseFragment {
-
 
     @Bind(R.id.btn_login)Button mLoginButton;
     @Bind(R.id.et_user_id)EditText editTextUserId;
@@ -40,10 +39,11 @@ public class LoginFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         String userId = AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId();
-        if (userId != null){
+        String displayName = AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getDisplayName();
+        if (userId != null && displayName != null){
             mLoginButton.setVisibility(View.GONE);
             mProgressBar.setVisibility(View.VISIBLE);
-            login();
+            goToGameActvity();
         }else {
             mLoginContent.setVisibility(View.VISIBLE);
             mLoginButton.setVisibility(View.VISIBLE);
@@ -53,31 +53,39 @@ public class LoginFragment extends BaseFragment {
     @OnClick(R.id.btn_login)
     public void loginButton(){
         mProgressBar.setVisibility(View.VISIBLE);
-//        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setUserId("test_device_1");
-//        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setDisplayId("Igor");
         AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setUserId(editTextUserId.getText().toString());
-        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setDisplayId(editTextUserName.getText().toString());
+        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setDisplayName(editTextUserName.getText().toString());
         login();
     }
 
-
+    private void buttonState(boolean isEnable){
+        editTextUserId.setEnabled(isEnable);
+        editTextUserName.setEnabled(isEnable);
+    }
 
     private void login(){
+        buttonState(false);
         User user = new User(AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId(),
-                AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getDisplayId());
-        AppTicTakToe.getsAppTicTakToe().initDonkyModel(user, new CallBack() {
+                AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getDisplayName());
+        AppTicTakToe.getsAppTicTakToe().updateUserDetails(user, new CallBack() {
             @Override
             public void success(Object response) {
-                Intent intent = new Intent(getActivity(), GamesActivity.class);
-                startActivity(intent);
-                getActivity().finish();
+                goToGameActvity();
             }
 
             @Override
             public void error(String message) {
+                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+                buttonState(true);
+                mLoginContent.setVisibility(View.VISIBLE);
                 mProgressBar.setVisibility(View.GONE);
             }
         });
+    }
 
+    private void goToGameActvity(){
+        Intent intent = new Intent(getActivity(), GamesActivity.class);
+        startActivity(intent);
+        getActivity().finish();
     }
 }

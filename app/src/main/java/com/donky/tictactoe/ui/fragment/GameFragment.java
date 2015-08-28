@@ -26,34 +26,17 @@ import butterknife.OnClick;
 
 public class GameFragment extends BaseFragment {
 
-    /** Start player. Must be 1 or 2. Default is 1. */
-    public static final String EXTRA_START_PLAYER =
-            "com.example.android.tictactoe.library.GameActivity.EXTRA_START_PLAYER";
-
-    private static final int MSG_COMPUTER_TURN = 1;
-    private static final long COMPUTER_DELAY_MS = 500;
-
     private GameSession mGameSession;
 
     @Bind(R.id.game_view) Game mGameView;
     @Bind(R.id.info_turn) TextView mInfoView;
     @Bind(R.id.next_turn) Button mButtonNext;
 
-    public interface OnGameSession{
-        GameSession currentSession();
-    }
-
     @OnClick(R.id.next_turn)
     public void finishGame(){
         super.getActivity().onBackPressed();
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-//        if (activity instanceof OnGameSession)
-//            mGameSession = ((OnGameSession) activity).currentSession();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,6 +57,9 @@ public class GameFragment extends BaseFragment {
         mGameSession = ((GamesActivity)getActivity()).mGameManager.getGameSession(position);
         mGameSession.setGameFragment(this);
         mGameView.onStartGame(mGameSession.getStates());
+        mGameView.setCurrentPlayer(mGameSession.getmInvite().isMyFirstMove() ? GameView.State.PLAYER1
+                : GameView.State.PLAYER2);
+        mGameSession.setIsActive(true);
         mGameView.setOnCellSelectedListener(new MyCellListener());
         mGameSession.setGameMoves(new GameMoves() {
             @Override
@@ -89,25 +75,6 @@ public class GameFragment extends BaseFragment {
             }
         });
         mButtonNext.setOnClickListener(new MyButtonListener());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        GameView.State player = mGameView.getCurrentState();
-        if (player == GameView.State.UNKNOWN) {
-            player = GameView.State.fromInt(getActivity().getIntent().getIntExtra(EXTRA_START_PLAYER, 1));
-            if (!checkGameFinished(player)) {
-                selectTurn(player);
-            }
-        }
-//        if (player == GameView.State.PLAYER2) {
-//            mHandler.sendEmptyMessageDelayed(MSG_COMPUTER_TURN, COMPUTER_DELAY_MS);
-//        }
-        if (player == GameView.State.WIN) {
-            setWinState(mGameView.getCurrentState());
-        }
     }
 
     private GameView.State selectTurn(GameView.State player) {
@@ -148,31 +115,6 @@ public class GameFragment extends BaseFragment {
         }
     }
 
-//    private class MyHandlerCallback implements Handler.Callback {
-//        public boolean handleMessage(Message msg) {
-//            if (msg.what == MSG_COMPUTER_TURN) {
-//
-//                // Pick a non-used cell at random. That's about all the AI you need for this game.
-//                GameView.State[] data = mGameView.getDataStates();
-//                int used = 0;
-//                while (used != 0x1F) {
-//                    int index = mRnd.nextInt(9);
-//                    if (((used >> index) & 1) == 0) {
-//                        used |= 1 << index;
-//                        if (data[index] == GameView.State.EMPTY) {
-//                            mGameView.setCell(index, mGameView.getCurrentPlayer());
-//                            break;
-//                        }
-//                    }
-//                }
-
-//                finishTurn();
-//                return true;
-//            }
-//            return false;
-//        }
-//    }
-
     private GameView.State getOtherPlayer(GameView.State player) {
         return player == GameView.State.PLAYER1 ? GameView.State.PLAYER2 : GameView.State.PLAYER1;
     }
@@ -181,9 +123,6 @@ public class GameFragment extends BaseFragment {
         GameView.State player = mGameView.getCurrentState();
         if (!checkGameFinished(player)) {
             player = selectTurn(getOtherPlayer(player));
-//            if (player == GameView.State.PLAYER2) {
-//                mHandler.sendEmptyMessageDelayed(MSG_COMPUTER_TURN, COMPUTER_DELAY_MS);
-//            }
         }
     }
 

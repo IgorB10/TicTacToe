@@ -3,7 +3,7 @@ package com.donky.tictactoe.tictactoe;
 import android.widget.Toast;
 
 import com.donky.tictactoe.AppTicTakToe;
-import com.donky.tictactoe.NotificationManager;
+import com.donky.tictactoe.InviteNotificationManager;
 import com.donky.tictactoe.model.Invite;
 import com.donky.tictactoe.utill.Constants;
 import com.google.gson.Gson;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 
-public class GameManager implements NotificationManager.OnNotificationListener<Invite>{
+public class GameManager implements InviteNotificationManager.OnInviteListener {
 
     private ArrayList<GameSession> mGameSessions;
     private Game mGame;
@@ -45,11 +45,11 @@ public class GameManager implements NotificationManager.OnNotificationListener<I
     }
 
     public void addListeners(){
-        NotificationManager.getInstance().addListener(Constants.INVITE, this);
+        InviteNotificationManager.getInstance().addListener(this);
     }
 
     public void removeListeners(){
-        NotificationManager.getInstance().removeListener(Constants.INVITE, this);
+        InviteNotificationManager.getInstance().removeListener(this);
     }
 
     private void createGameSession(Invite invite){
@@ -66,7 +66,8 @@ public class GameManager implements NotificationManager.OnNotificationListener<I
 
     public void sendInvite(String toUserId){
         final Invite invite = new Invite(AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId(),
-                toUserId, random.nextInt(Integer.MAX_VALUE), Constants.PROPOSE);
+                toUserId, random.nextInt(Integer.MAX_VALUE), Constants.PROPOSE,
+                random.nextBoolean() ?  AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId()  : toUserId);
         sendInvite(invite, true);
     }
 
@@ -79,7 +80,7 @@ public class GameManager implements NotificationManager.OnNotificationListener<I
             e.printStackTrace();
         }
         ContentNotification contentNotification =
-                new ContentNotification(invite.getOpponetUserId(), Constants.INVITE, jsonObject);
+                new ContentNotification(invite.getOpponentUserId(), Constants.INVITE, jsonObject);
 
         DonkyNetworkController.getInstance().sendContentNotification(
                 contentNotification,

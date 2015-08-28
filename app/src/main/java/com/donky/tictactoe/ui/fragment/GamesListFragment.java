@@ -1,12 +1,10 @@
 package com.donky.tictactoe.ui.fragment;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,23 +12,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.donky.tictactoe.R;
-import com.donky.tictactoe.tictactoe.GameManager;
 import com.donky.tictactoe.tictactoe.GameSession;
 import com.donky.tictactoe.ui.dialog.AddGameDialog;
 
-import net.donky.core.DonkyException;
-import net.donky.core.DonkyListener;
-import net.donky.core.network.DonkyNetworkController;
-import net.donky.core.network.content.ContentNotification;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -110,7 +97,7 @@ public class GamesListFragment extends BaseFragment {
                 convertView.setTag(viewHolder);
             }
             final GameSession session = getItem(position);
-            viewHolder.content.setText(session.getmInvite().getOpponetUserId());
+            viewHolder.content.setText(session.getmInvite().getOpponentUserId());
             return convertView;
         }
     }

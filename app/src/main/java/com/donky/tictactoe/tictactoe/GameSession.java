@@ -1,18 +1,14 @@
 package com.donky.tictactoe.tictactoe;
 
-import android.content.Intent;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import com.donky.tictactoe.AppTicTakToe;
-import com.donky.tictactoe.NotificationManager;
 import com.donky.tictactoe.model.Invite;
 import com.donky.tictactoe.model.Move;
 import com.donky.tictactoe.ui.fragment.GameFragment;
 import com.donky.tictactoe.ui.view.GameView.State;
-import com.donky.tictactoe.utill.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -34,6 +30,7 @@ public class GameSession implements NotificationListener<ServerNotification> {
 
     private Invite mInvite;
     private State[] states;
+    private boolean isActive;
 
     private GameFragment gameFragment;
     private GameMoves mGameMoves;
@@ -58,6 +55,14 @@ public class GameSession implements NotificationListener<ServerNotification> {
             if (mGameMoves != null)
                 mGameMoves.receive(move);
         }
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     public void setGameFragment(GameFragment gameFragment) {
@@ -104,7 +109,7 @@ public class GameSession implements NotificationListener<ServerNotification> {
             e.printStackTrace();
         }
         ContentNotification contentNotification =
-                new ContentNotification(mInvite.getOpponetUserId(), mInvite.getOpponetUserId()+ "_" + mInvite.getGameId(), jsonObject);
+                new ContentNotification(mInvite.getOpponentUserId(), mInvite.getOpponentUserId()+ "_" + mInvite.getGameId(), jsonObject);
 
         DonkyNetworkController.getInstance().sendContentNotification(
                 contentNotification,

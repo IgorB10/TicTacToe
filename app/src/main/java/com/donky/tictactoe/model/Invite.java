@@ -11,12 +11,14 @@ public class Invite implements Parcelable {
     private String fromUserId;
     private int gameId;
     private String state;
+    private String firstMove;
 
-    public Invite(String fromUser, String toUser, int gameId, String state) {
-        this.fromUserId = fromUser;
-        this.toUserId = toUser;
+    public Invite(String toUserId, String fromUserId, int gameId, String state, String firstMove) {
+        this.toUserId = toUserId;
+        this.fromUserId = fromUserId;
         this.gameId = gameId;
         this.state = state;
+        this.firstMove = firstMove;
     }
 
     private Invite(Parcel in) {
@@ -24,6 +26,7 @@ public class Invite implements Parcelable {
         toUserId = in.readString();
         gameId = in.readInt();
         state = in.readString();
+        firstMove = in.readString();
     }
 
     public String getToUserId() {
@@ -54,11 +57,11 @@ public class Invite implements Parcelable {
         return state;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public boolean isMyFirstMove(){
+        return AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId().equals(firstMove);
     }
 
-    public String getOpponetUserId(){
+    public String getOpponentUserId(){
         return AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId().equals(fromUserId)
                 ? toUserId : fromUserId;
     }
@@ -75,7 +78,8 @@ public class Invite implements Parcelable {
             return false;
         if (fromUserId != null ? !fromUserId.equals(invite.fromUserId) : invite.fromUserId != null)
             return false;
-        return !(state != null ? !state.equals(invite.state) : invite.state != null);
+        if (state != null ? !state.equals(invite.state) : invite.state != null) return false;
+        return !(firstMove != null ? !firstMove.equals(invite.firstMove) : invite.firstMove != null);
 
     }
 
@@ -85,6 +89,7 @@ public class Invite implements Parcelable {
         result = 31 * result + (fromUserId != null ? fromUserId.hashCode() : 0);
         result = 31 * result + gameId;
         result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (firstMove != null ? firstMove.hashCode() : 0);
         return result;
     }
 
@@ -110,5 +115,6 @@ public class Invite implements Parcelable {
         dest.writeString(toUserId);
         dest.writeInt(gameId);
         dest.writeString(state);
+        dest.writeString(firstMove);
     }
 }
