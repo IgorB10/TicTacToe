@@ -30,7 +30,8 @@ public class GameSession implements NotificationListener<ServerNotification> {
 
     private Invite mInvite;
     private State[] states;
-    private boolean isActive;
+    private State lastMove;
+
 
     private GameFragment gameFragment;
     private GameMoves mGameMoves;
@@ -57,12 +58,12 @@ public class GameSession implements NotificationListener<ServerNotification> {
         }
     }
 
-    public boolean isActive() {
-        return isActive;
+    public State getLastMove() {
+        return lastMove;
     }
 
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setLastMove(State lastMove) {
+        this.lastMove = lastMove;
     }
 
     public void setGameFragment(GameFragment gameFragment) {

@@ -57,9 +57,12 @@ public class GameFragment extends BaseFragment {
         mGameSession = ((GamesActivity)getActivity()).mGameManager.getGameSession(position);
         mGameSession.setGameFragment(this);
         mGameView.onStartGame(mGameSession.getStates());
+        //FIXME
+//        if (mGameSession.getLastMove() == null)
         selectTurn(mGameSession.getmInvite().isMyFirstMove() ? GameView.State.PLAYER1
-                : GameView.State.PLAYER2);
-        mGameSession.setIsActive(true);
+            : GameView.State.PLAYER2);
+//        else
+//            selectTurn(mGameSession.getLastMove());
         mGameView.setOnCellSelectedListener(new MyCellListener());
         mGameSession.setGameMoves(new GameMoves() {
             @Override
@@ -75,6 +78,12 @@ public class GameFragment extends BaseFragment {
             }
         });
         mButtonNext.setOnClickListener(new MyButtonListener());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mGameSession.setLastMove(mGameView.getCurrentState());
     }
 
     private GameView.State selectTurn(GameView.State player) {
