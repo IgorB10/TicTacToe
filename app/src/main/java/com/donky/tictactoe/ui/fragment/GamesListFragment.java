@@ -28,6 +28,9 @@ public class GamesListFragment extends BaseFragment {
     @Bind(R.id.lv_games)
     ListView mSessionGamesListView;
 
+    @Bind(android.R.id.empty)
+    TextView emptyTextView;
+
     private GamesListAdapter mGamesListAdapter;
     private OnSessionSelectedListener mSessionSelectedListener;
     private ArrayList<GameSession> mGameSessions;
@@ -41,6 +44,7 @@ public class GamesListFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mSessionGamesListView.setEmptyView(emptyTextView);
         initAdapter();
     }
 

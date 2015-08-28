@@ -12,6 +12,14 @@
         android:layout_height="match_parent">
     </ListView>
 
+    <TextView
+        android:id="@id/android:empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:text="@string/no_active_games" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_add_game"
         android:layout_width="wrap_content"

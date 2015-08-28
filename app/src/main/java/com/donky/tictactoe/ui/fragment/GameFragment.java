@@ -57,7 +57,7 @@ public class GameFragment extends BaseFragment {
         mGameSession = ((GamesActivity)getActivity()).mGameManager.getGameSession(position);
         mGameSession.setGameFragment(this);
         mGameView.onStartGame(mGameSession.getStates());
-        mGameView.setCurrentPlayer(mGameSession.getmInvite().isMyFirstMove() ? GameView.State.PLAYER1
+        selectTurn(mGameSession.getmInvite().isMyFirstMove() ? GameView.State.PLAYER1
                 : GameView.State.PLAYER2);
         mGameSession.setIsActive(true);
         mGameView.setOnCellSelectedListener(new MyCellListener());
