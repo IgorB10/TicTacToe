@@ -53,10 +53,10 @@ public class LoginFragment extends BaseFragment {
     @OnClick(R.id.btn_login)
     public void loginButton(){
         mProgressBar.setVisibility(View.VISIBLE);
-        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setUserId("test_device_1");
-        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setDisplayId("Igor");
-//        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setUserId(user.getUserId());
-//        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setDisplayId(user.getDisplayName());
+//        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setUserId("test_device_1");
+//        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setDisplayId("Igor");
+        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setUserId(editTextUserId.getText().toString());
+        AppTicTakToe.getsAppTicTakToe().getPreferencesManager().setDisplayId(editTextUserName.getText().toString());
         login();
     }
 

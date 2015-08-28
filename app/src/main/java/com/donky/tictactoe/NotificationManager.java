@@ -1,6 +1,8 @@
 package com.donky.tictactoe;
 
 import com.donky.tictactoe.model.Invite;
+import com.donky.tictactoe.model.Move;
+import com.donky.tictactoe.utill.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -53,8 +55,15 @@ public class NotificationManager implements NotificationListener<ServerNotificat
         JsonObject data = serverNotification.getData();
         String type = data.get("customType").getAsString();
         Gson gson = new GsonBuilder().create();
-        Invite invite = gson.fromJson(data.get("customData"), Invite.class);
-        for (OnNotificationListener listener : mNotificationMap.get(type))
-            listener.notifyObservers(invite);
+        //FIXME
+        if (type.equals(Constants.INVITE)) {
+            Invite invite = gson.fromJson(data.get("customData"), Invite.class);
+            for (OnNotificationListener listener : mNotificationMap.get(type))
+                listener.notifyObservers(invite);
+        } else if (type.equals(Constants.MOVE)){
+            Move move = gson.fromJson(data.get("customData"), Move.class);
+            for (OnNotificationListener listener : mNotificationMap.get(type))
+                listener.notifyObservers(move);
+        }
     }
 }

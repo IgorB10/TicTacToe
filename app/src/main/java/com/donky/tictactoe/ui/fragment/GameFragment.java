@@ -1,5 +1,6 @@
 package com.donky.tictactoe.ui.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,6 +12,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.donky.tictactoe.R;
+import com.donky.tictactoe.model.Move;
+import com.donky.tictactoe.tictactoe.GameMoves;
 import com.donky.tictactoe.tictactoe.GameSession;
 import com.donky.tictactoe.ui.view.GameView;
 
@@ -36,6 +39,18 @@ public class GameFragment extends BaseFragment {
     @Bind(R.id.info_turn) TextView mInfoView;
     @Bind(R.id.next_turn) Button mButtonNext;
 
+    public interface OnGameSession{
+        GameSession currentSession();
+    }
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+//        if (activity instanceof OnGameSession)
+//            mGameSession = ((OnGameSession) activity).currentSession();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,7 +63,20 @@ public class GameFragment extends BaseFragment {
         mGameView.setFocusable(true);
         mGameView.setFocusableInTouchMode(true);
         mGameView.setCellListener(new MyCellListener());
+        mGameView.setStates(mGameSession.getStates());
+        mGameSession.setGameMoves(new GameMoves() {
+            @Override
+            public void move(Move move) {
 
+            }
+
+            @Override
+            public void receive(Move move) {
+                mGameView.update();
+                selectTurn(GameView.State.PLAYER2);
+                finishTurn();
+            }
+        });
         mButtonNext.setOnClickListener(new MyButtonListener());
     }
 
@@ -71,8 +99,8 @@ public class GameFragment extends BaseFragment {
         }
     }
 
-    public void setmGameSession(GameSession mGameSession) {
-        this.mGameSession = mGameSession;
+    public void setGameSession(GameSession session){
+        mGameSession = session;
     }
 
     private GameView.State selectTurn(GameView.State player) {
@@ -100,6 +128,7 @@ public class GameFragment extends BaseFragment {
                 int cell = mGameView.getSelection();
                 if (cell >= 0) {
                     mGameView.setCell(cell, player);
+                    mGameSession.sendMove(new Move(cell));
                     finishTurn();
                 }
             }
@@ -130,7 +159,7 @@ public class GameFragment extends BaseFragment {
                     }
                 }
 
-                finishTurn();
+//                finishTurn();
                 return true;
             }
             return false;
@@ -145,9 +174,9 @@ public class GameFragment extends BaseFragment {
         GameView.State player = mGameView.getCurrentPlayer();
         if (!checkGameFinished(player)) {
             player = selectTurn(getOtherPlayer(player));
-            if (player == GameView.State.PLAYER2) {
-                mHandler.sendEmptyMessageDelayed(MSG_COMPUTER_TURN, COMPUTER_DELAY_MS);
-            }
+//            if (player == GameView.State.PLAYER2) {
+//                mHandler.sendEmptyMessageDelayed(MSG_COMPUTER_TURN, COMPUTER_DELAY_MS);
+//            }
         }
     }
 

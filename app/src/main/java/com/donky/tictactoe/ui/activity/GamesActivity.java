@@ -21,11 +21,12 @@ import com.donky.tictactoe.ui.fragment.GamesListFragment;
 
 public class GamesActivity extends Activity implements AddGameDialog.OnUserInviteListener,
                                                                 GameManager.Game,
-                                                                GamesListFragment.OnSessionSelectedListener{
+                                                                GamesListFragment.OnSessionSelectedListener {
 
     private GamesListFragment mGamesListFragment;
     private GameManager mGameManager;
     private GameFragment mGameFragment;
+
 
 
     @Override
@@ -117,13 +118,20 @@ public class GamesActivity extends Activity implements AddGameDialog.OnUserInvit
     public void sessionPosition(int position) {
         if (mGameFragment == null)
             mGameFragment = new GameFragment();
-        mGameFragment.setmGameSession(mGameManager.getGameSession(position));
+        this.position = position;
+        //FIXME
+        GameSession session = mGameManager.getGameSession(position);
+        session.setGameFragment(mGameFragment);
+        mGameFragment.setGameSession(session);
+
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction
                 .replace(R.id.content, mGameFragment, "GameFragment")
                 .addToBackStack("mGamesListFragment_GameFragment")
                 .commit();
     }
+
+    int position;
 
     @Override
     public void onBackPressed() {

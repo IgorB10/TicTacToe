@@ -8,6 +8,7 @@ import com.donky.tictactoe.controllers.RegistrationController;
 import com.donky.tictactoe.model.User;
 import com.donky.tictactoe.network.CallBack;
 import com.donky.tictactoe.ui.AppDonkyListener;
+import com.donky.tictactoe.utill.Constants;
 import com.donky.tictactoe.utill.PreferencesManager;
 
 import net.donky.core.DonkyCore;
@@ -48,10 +49,14 @@ public class AppTicTakToe extends Application {
         UserDetails userDetails = new UserDetails();
         userDetails.setUserId(user.getUserId()).setUserDisplayName(user.getDisplayName());
         DeviceDetails deviceDetails = new DeviceDetails("my Nexus", "Nexus", null);
-        Subscription<ServerNotification> subscription =
-                new Subscription<>("invite", NotificationManager.getInstance());
+        Subscription<ServerNotification> subscriptionInvites =
+                new Subscription<>(Constants.INVITE, NotificationManager.getInstance());
+        Subscription<ServerNotification> subscriptionMoves =
+                new Subscription<>(Constants.MOVE, NotificationManager.getInstance());
         DonkyCore.subscribeToContentNotifications(
-                new ModuleDefinition("Chess Game", "1.0.0.0"), subscription);
+                new ModuleDefinition("TicTakToe Game", "1.0.0.0"), subscriptionInvites);
+        DonkyCore.subscribeToContentNotifications(
+                new ModuleDefinition("TicTakToe Game", "1.0.0.0"), subscriptionMoves);
         DonkyCore.initialiseDonkySDK(this,
                 KEY,
                 userDetails,

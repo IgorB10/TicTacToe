@@ -63,7 +63,7 @@ public class GameManager {
 
 
     public void acceptInvite(Invite invite){
-        sendInvite(invite.getFromUserId(), invite);
+        sendInvite(invite, false);
         createGameSession(invite);
     }
 
@@ -82,10 +82,10 @@ public class GameManager {
     public void sendInvite(String toUserId){
         final Invite invite = new Invite(AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId(),
                 toUserId, random.nextInt(Integer.MAX_VALUE), Constants.PROPOSE);
-        sendInvite(toUserId, invite);
+        sendInvite(invite, true);
     }
 
-    private void sendInvite(String toUserId, final Invite invite){
+    private void sendInvite(final Invite invite, final boolean isSaveInvite){
         String jsonString = new Gson().toJson(invite);
         JSONObject jsonObject = null;
         try {
@@ -94,14 +94,15 @@ public class GameManager {
             e.printStackTrace();
         }
         ContentNotification contentNotification =
-                new ContentNotification(toUserId, Constants.INVITE, jsonObject);
+                new ContentNotification(invite.getOpponetUserId(), Constants.INVITE, jsonObject);
 
         DonkyNetworkController.getInstance().sendContentNotification(
                 contentNotification,
                 new DonkyListener(){
                     @Override
                     public void success() {
-                        mSendInvited.add(invite);
+                        if (isSaveInvite)
+                            mSendInvited.add(invite);
                         Toast.makeText(AppTicTakToe.getsAppTicTakToe(), "success", Toast.LENGTH_LONG).show();
                     }
 

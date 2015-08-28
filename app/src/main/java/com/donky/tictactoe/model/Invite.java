@@ -3,6 +3,8 @@ package com.donky.tictactoe.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.donky.tictactoe.AppTicTakToe;
+
 public class Invite implements Parcelable {
 
     private String toUserId;
@@ -54,6 +56,11 @@ public class Invite implements Parcelable {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getOpponetUserId(){
+        return AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId().equals(fromUserId)
+                ? toUserId : fromUserId;
     }
 
     @Override

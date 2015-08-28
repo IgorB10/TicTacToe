@@ -9,6 +9,7 @@ import com.donky.tictactoe.AppTicTakToe;
 import com.donky.tictactoe.NotificationManager;
 import com.donky.tictactoe.model.Invite;
 import com.donky.tictactoe.model.Move;
+import com.donky.tictactoe.ui.fragment.GameFragment;
 import com.donky.tictactoe.ui.view.GameView.State;
 import com.donky.tictactoe.utill.Constants;
 import com.google.gson.Gson;
@@ -21,31 +22,44 @@ import net.donky.core.network.content.ContentNotification;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GameSession implements GameMoves{
+public class GameSession {
 
     private Invite mInvite;
     private State[] states;
 
+    private GameFragment gameFragment;
+    private GameMoves mGameMoves;
+
     public GameSession(Invite invite){
         mInvite = invite;
         initStates();
-        NotificationManager.getInstance().addListener(Constants.GAME + invite.getGameId(), new NotificationManager.OnNotificationListener<Move>() {
+        NotificationManager.getInstance().addListener(Constants.MOVE, new NotificationManager.OnNotificationListener<Move>() {
             @Override
             public void notifyObservers(Move move) {
-                receive(move);
+                states[move.getPosition()] = State.PLAYER2;
+                mGameMoves.receive(move);
             }
         });
     }
 
-    @Override
-    public void move(Move move) {
-        sendMove(move);
+    public void setGameFragment(GameFragment gameFragment) {
+        this.gameFragment = gameFragment;
     }
 
-    @Override
-    public void receive(Move move) {
-        states[move.getPosition()] = State.PLAYER2;
+    public void setGameMoves(GameMoves mGameMoves) {
+        this.mGameMoves = mGameMoves;
     }
+
+//    @Override
+//    public void move(Move move) {
+//        sendMove(move);
+//    }
+//
+//    @Override
+//    public void receive(Move move) {
+//        states[move.getPosition()] = State.PLAYER2;
+//        gameFragment.update();
+//    }
 
     public Invite getmInvite() {
         return mInvite;
@@ -63,7 +77,7 @@ public class GameSession implements GameMoves{
         this.states = states;
     }
 
-    private void sendMove(final Move move){
+    public void sendMove(final Move move){
         String jsonString = new Gson().toJson(move);
         JSONObject jsonObject = null;
         try {
@@ -72,7 +86,7 @@ public class GameSession implements GameMoves{
             e.printStackTrace();
         }
         ContentNotification contentNotification =
-                new ContentNotification(mInvite.getToUserId(), Constants.INVITE, jsonObject);
+                new ContentNotification(mInvite.getOpponetUserId(), Constants.MOVE, jsonObject);
 
         DonkyNetworkController.getInstance().sendContentNotification(
                 contentNotification,

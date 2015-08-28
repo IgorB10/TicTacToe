@@ -39,7 +39,7 @@ public class GameView extends View {
     private Paint mLinePaint;
     private Paint mBmpPaint;
 
-    private final State[] mDataStates = new State[9];
+    private State[] mDataStates = new State[9];
 
     private final Rect mSrcRect = new Rect();
     private final Rect mDstRect = new Rect();
@@ -108,9 +108,15 @@ public class GameView extends View {
         mWinPaint.setStrokeWidth(10);
         mWinPaint.setStyle(Paint.Style.STROKE);
 
-        for (int i = 0; i < mDataStates.length; i++) {
-            mDataStates[i] = State.EMPTY;
-        }
+    }
+
+    public void setStates(State[] states){
+        mDataStates = states;
+        invalidate();
+    }
+
+    public void update(){
+        invalidate();
     }
 
     @Override
