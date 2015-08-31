@@ -37,7 +37,7 @@ public class InviteDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.invite_dialog, null);
         mInvitedUser = (TextView)view.findViewById(R.id.invited_user_id);
-        mInvitedUser.setText(mInvite.getFromUserId());
+        mInvitedUser.setText(mInvite.getOpponentUserId());
         return new AlertDialog.Builder(getActivity())
                 .setView(view)
                 .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {

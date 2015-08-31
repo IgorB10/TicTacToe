@@ -17,13 +17,4 @@
         android:layout_marginBottom="10dip"
         />
 
-    <Button
-        android:id="@+id/next_turn"
-        android:text="I'm done"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dip"
-        android:layout_marginRight="20dip"
-        />
-
 </LinearLayout>

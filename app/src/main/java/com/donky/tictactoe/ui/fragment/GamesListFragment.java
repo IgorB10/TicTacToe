@@ -11,10 +11,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.donky.tictactoe.R;
-import com.donky.tictactoe.tictactoe.GameSession;
+import com.donky.tictactoe.model.GameSessionController;
 import com.donky.tictactoe.ui.dialog.AddGameDialog;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class GamesListFragment extends BaseFragment {
 
     private GamesListAdapter mGamesListAdapter;
     private OnSessionSelectedListener mSessionSelectedListener;
-    private ArrayList<GameSession> mGameSessions;
+    private ArrayList<GameSessionController> mGameSessions;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +72,7 @@ public class GamesListFragment extends BaseFragment {
         });
     }
 
-    public void setSession(ArrayList<GameSession> sessions){
+    public void setSession(ArrayList<GameSessionController> sessions){
         mGameSessions = sessions;
     }
 
@@ -83,9 +84,9 @@ public class GamesListFragment extends BaseFragment {
         this.mSessionSelectedListener = mSessionSelectedListener;
     }
 
-    private class GamesListAdapter extends ArrayAdapter<GameSession>{
+    private class GamesListAdapter extends ArrayAdapter<GameSessionController>{
 
-        public GamesListAdapter(Context context, ArrayList<GameSession> sessions){
+        public GamesListAdapter(Context context, ArrayList<GameSessionController> sessions){
             super(context, 0, sessions);
         }
 
@@ -96,12 +97,23 @@ public class GamesListFragment extends BaseFragment {
                 viewHolder = (ViewHolder) convertView.getTag();
             } else {
                 convertView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.grid_item, parent, false);
+                        .inflate(R.layout.game_session_item, parent, false);
                 viewHolder = new ViewHolder(convertView);
                 convertView.setTag(viewHolder);
             }
-            final GameSession session = getItem(position);
-            viewHolder.content.setText(session.getmInvite().getOpponentUserId());
+            convertView.setClickable(true);
+            final GameSessionController sessionController = getItem(position);
+            if (sessionController.getGameState() == GameSessionController.GameState.STARTING){
+                viewHolder.content.setText(getString(R.string.starting_game_with) + sessionController.getOpponentName());
+                viewHolder.progressGame.setVisibility(View.VISIBLE);
+            }else if (sessionController.getGameState() == GameSessionController.GameState.PLAYING){
+                viewHolder.content.setText(getString(R.string.playing_with) + " " + sessionController.getOpponentName());
+                viewHolder.progressGame.setVisibility(View.INVISIBLE);
+            }else if (sessionController.getGameState() == GameSessionController.GameState.FINISH){
+                viewHolder.content.setText(getString(R.string.finish_game));
+                convertView.setClickable(false);
+                viewHolder.progressGame.setVisibility(View.INVISIBLE);
+            }
             return convertView;
         }
     }
@@ -110,6 +122,9 @@ public class GamesListFragment extends BaseFragment {
 
         @Bind(R.id.content)
         TextView content;
+
+        @Bind(R.id.progress_game)
+        ProgressBar progressGame;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);

@@ -11,8 +11,8 @@
     <string name="cancel">Cancel</string>
     <!--<string name="ServiceURL">https://client-api.mobiledonky.com</string>-->
 
-    <string name="player2_win">Player 2 (not you) wins!</string>
-    <string name="player1_win">Player 1 (you) wins!</string>
+    <string name="player2_win">You lose!</string>
+    <string name="player1_win">You win!</string>
     <string name="tie">This is a tie! No one wins!</string>
     <string name="player2_turn">Player 2\'s turn (that\'s not you)</string>
     <string name="player1_turn">Player 1\'s turn -- that\'s you!</string>
@@ -24,4 +24,7 @@
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
     <string name="no_active_games">No Active Games</string>
+    <string name="starting_game_with">Starting game with... </string>
+    <string name="playing_with">Playing with</string>
+    <string name="finish_game">Finish game</string>
 </resources>

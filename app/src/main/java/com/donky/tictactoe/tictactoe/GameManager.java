@@ -4,6 +4,7 @@ import android.widget.Toast;
 
 import com.donky.tictactoe.AppTicTakToe;
 import com.donky.tictactoe.InviteNotificationManager;
+import com.donky.tictactoe.model.GameSessionController;
 import com.donky.tictactoe.model.Invite;
 import com.donky.tictactoe.utill.Constants;
 import com.google.gson.Gson;
@@ -22,7 +23,7 @@ import java.util.Random;
 
 public class GameManager implements InviteNotificationManager.OnInviteListener {
 
-    private ArrayList<GameSession> mGameSessions;
+    private ArrayList<GameSessionController> mGameSessions;
     private Game mGame;
     private ArrayList<Invite> mSendInvited;
     private Random random = new Random();
@@ -53,10 +54,10 @@ public class GameManager implements InviteNotificationManager.OnInviteListener {
     }
 
     private void createGameSession(Invite invite){
-        GameSession gameSession = new GameSession(invite);
-        mGameSessions.add(gameSession);
+        GameSessionController gameSession = getSessionByInvite(invite);
+        gameSession.setmGameState(GameSessionController.GameState.PLAYING);
         mSendInvited.remove(invite);
-        mGame.onCreateGame(gameSession);
+        mGame.onCreateGame();
     }
 
     public void acceptInvite(Invite invite){
@@ -69,9 +70,14 @@ public class GameManager implements InviteNotificationManager.OnInviteListener {
                 toUserId, random.nextInt(Integer.MAX_VALUE), Constants.PROPOSE,
                 random.nextBoolean() ?  AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId()  : toUserId);
         sendInvite(invite, true);
+        mGame.onInviteSend();
     }
 
     private void sendInvite(final Invite invite, final boolean isSaveInvite){
+
+        GameSessionController gameSession = new GameSessionController(invite);
+        mGameSessions.add(gameSession);
+
         String jsonString = new Gson().toJson(invite);
         JSONObject jsonObject = null;
         try {
@@ -87,9 +93,10 @@ public class GameManager implements InviteNotificationManager.OnInviteListener {
                 new DonkyListener() {
                     @Override
                     public void success() {
-                        if (isSaveInvite)
+                        if (isSaveInvite) {
                             mSendInvited.add(invite);
-                        Toast.makeText(AppTicTakToe.getsAppTicTakToe(), "success", Toast.LENGTH_LONG).show();
+                        }
+                        Toast.makeText(AppTicTakToe.getsAppTicTakToe(), "success send", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -103,12 +110,19 @@ public class GameManager implements InviteNotificationManager.OnInviteListener {
         mSendInvited.remove(invite);
     }
 
-    public GameSession getGameSession(int position){
+    public GameSessionController getGameSession(int position){
         return mGameSessions.get(position);
     }
 
-    public ArrayList<GameSession> getGameSessions() {
+    public ArrayList<GameSessionController> getGameSessions() {
         return mGameSessions;
+    }
+
+    public GameSessionController getSessionByInvite(Invite invite){
+        for (GameSessionController controller : mGameSessions)
+            if (controller.getGameSession().getmInvite().equals(invite))
+                return controller;
+        return null;
     }
 
 
@@ -116,11 +130,11 @@ public class GameManager implements InviteNotificationManager.OnInviteListener {
 
         void onInviteSend();
 
-        void onCreateGame(GameSession gameSession);
+        void onCreateGame();
 
         void onInviteReceived(Invite invite);
 
-        void onFinishGame(GameSession gameSession);
+        void onFinishGame();
     }
 
 }

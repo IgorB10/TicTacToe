@@ -1,42 +1,28 @@
 package com.donky.tictactoe.ui.fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.donky.tictactoe.R;
+import com.donky.tictactoe.model.GameSessionController;
 import com.donky.tictactoe.model.Move;
 import com.donky.tictactoe.tictactoe.Game;
 import com.donky.tictactoe.tictactoe.GameMoves;
-import com.donky.tictactoe.tictactoe.GameSession;
 import com.donky.tictactoe.ui.activity.GamesActivity;
 import com.donky.tictactoe.ui.view.GameView;
 
-import java.util.Random;
-
 import butterknife.Bind;
-import butterknife.OnClick;
 
 public class GameFragment extends BaseFragment {
 
-    private GameSession mGameSession;
+    private GameSessionController mGameSessionController;
 
     @Bind(R.id.game_view) Game mGameView;
     @Bind(R.id.info_turn) TextView mInfoView;
-    @Bind(R.id.next_turn) Button mButtonNext;
-
-    @OnClick(R.id.next_turn)
-    public void finishGame(){
-        super.getActivity().onBackPressed();
-    }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,16 +40,16 @@ public class GameFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         int position = getArguments().getInt(GamesActivity.EXTRA_SELECTED_SESION);
-        mGameSession = ((GamesActivity)getActivity()).mGameManager.getGameSession(position);
-        mGameView.onStartGame(mGameSession.getStates());
         //FIXME
-//        if (mGameSession.getLastMove() == null)
-        selectTurn(mGameSession.getmInvite().isMyFirstMove() ? GameView.State.PLAYER1
-            : GameView.State.PLAYER2);
-//        else
-//            selectTurn(mGameSession.getLastMove());
+        mGameSessionController = ((GamesActivity)getActivity()).mGameManager.getGameSession(position);
+        mGameView.onStartGame(mGameSessionController.getStates());
+        if (mGameSessionController.getLastMovedPlayer() == GameView.State.EMPTY)
+        selectTurn(mGameSessionController.isMyFirstMove() ? GameView.State.PLAYER1
+                : GameView.State.PLAYER2);
+        else
+            selectTurn(mGameSessionController.getLastMovedPlayer());
         mGameView.setOnCellSelectedListener(new MyCellListener());
-        mGameSession.setGameMoves(new GameMoves() {
+        mGameSessionController.setGameMoves(new GameMoves() {
             @Override
             public void move(Move move) {
 
@@ -76,19 +62,10 @@ public class GameFragment extends BaseFragment {
                 finishTurn();
             }
         });
-        mButtonNext.setOnClickListener(new MyButtonListener());
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mGameSession.setLastMove(mGameView.getCurrentState());
     }
 
     private GameView.State selectTurn(GameView.State player) {
         mGameView.setCurrentPlayer(player);
-        mButtonNext.setEnabled(false);
-
         if (player == GameView.State.PLAYER1) {
             mInfoView.setText(R.string.player1_turn);
             mGameView.setEnabled(true);
@@ -110,16 +87,10 @@ public class GameFragment extends BaseFragment {
                 int cell = mGameView.getSelection();
                 if (cell >= 0) {
                     mGameView.setCell(cell, player);
-                    mGameSession.sendMove(new Move(cell));
+                    mGameSessionController.sendMove(cell);
                     finishTurn();
                 }
             }
-        }
-    }
-
-    private class MyButtonListener implements View.OnClickListener {
-
-        public void onClick(View v) {
         }
     }
 
@@ -135,7 +106,7 @@ public class GameFragment extends BaseFragment {
     }
 
     public boolean checkGameFinished(GameView.State player) {
-        GameView.State[] data = mGameSession.getStates();
+        GameView.State[] data = mGameSessionController.getStates();
         boolean full = true;
 
         int col = -1;
@@ -183,6 +154,8 @@ public class GameFragment extends BaseFragment {
 
     private void setFinished(GameView.State player, int col, int row, int diagonal) {
 
+        mGameSessionController.setGameOver(player);
+
         mGameView.setCurrentPlayer(GameView.State.WIN);
         mGameView.setWinner(player);
         mGameView.setEnabled(false);
@@ -192,11 +165,7 @@ public class GameFragment extends BaseFragment {
     }
 
     private void setWinState(GameView.State player) {
-        mButtonNext.setEnabled(true);
-        mButtonNext.setText("Back");
-
         String text;
-
         if (player == GameView.State.EMPTY) {
             text = getString(R.string.tie);
         } else if (player == GameView.State.PLAYER1) {

@@ -26,34 +26,16 @@ import net.donky.core.network.content.ContentNotification;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GameSession implements NotificationListener<ServerNotification> {
+public class GameSession {
 
     private Invite mInvite;
     private State[] states;
     private State lastMove;
 
-    private GameMoves mGameMoves;
-
     public GameSession(Invite invite){
         mInvite = invite;
         initStates();
-        ModuleDefinition moduleDefinition = new ModuleDefinition("TicTakToe Game", "1.0.0.0");
-        Subscription subscription = new Subscription<>(AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId() + "_" + mInvite.getGameId(), this);
-        DonkyCore.subscribeToContentNotifications(moduleDefinition, subscription);
-    }
 
-    @Override
-    public void onNotification(ServerNotification serverNotification) {
-
-        JsonObject data = serverNotification.getData();
-        String type = data.get("customType").getAsString();
-        if ((AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId() + "_" + mInvite.getGameId()).equals(type)) {
-            Gson gson = new GsonBuilder().create();
-            Move move = gson.fromJson(data.get("customData"), Move.class);
-            states[move.getPosition()] = State.PLAYER2;
-            if (mGameMoves != null && states[move.getPosition()] == State.EMPTY)
-                mGameMoves.receive(move);
-        }
     }
 
     public State getLastMove() {
@@ -62,10 +44,6 @@ public class GameSession implements NotificationListener<ServerNotification> {
 
     public void setLastMove(State lastMove) {
         this.lastMove = lastMove;
-    }
-
-    public void setGameMoves(GameMoves mGameMoves) {
-        this.mGameMoves = mGameMoves;
     }
 
     public Invite getmInvite() {
@@ -84,32 +62,7 @@ public class GameSession implements NotificationListener<ServerNotification> {
         this.states = states;
     }
 
-    public void sendMove(final Move move){
-        String jsonString = new Gson().toJson(move);
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(jsonString);
-        }catch (JSONException e){
-            e.printStackTrace();
-        }
-        ContentNotification contentNotification =
-                new ContentNotification(mInvite.getOpponentUserId(), mInvite.getOpponentUserId()+ "_" + mInvite.getGameId(), jsonObject);
 
-        DonkyNetworkController.getInstance().sendContentNotification(
-                contentNotification,
-                new DonkyListener(){
-                    @Override
-                    public void success() {
-                        states[move.getPosition()] = State.PLAYER1;
-                        Toast.makeText(AppTicTakToe.getsAppTicTakToe(), "success move", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void error(DonkyException e, Map<String, String> map) {
-                        Toast.makeText(AppTicTakToe.getsAppTicTakToe(), e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
 
     public void initStates(){
         states = new State[9];

@@ -57,8 +57,8 @@ public class Invite implements Parcelable {
         return state;
     }
 
-    public boolean isMyFirstMove(){
-        return AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId().equals(firstMove);
+    public String getFirstMove() {
+        return firstMove;
     }
 
     public String getOpponentUserId(){

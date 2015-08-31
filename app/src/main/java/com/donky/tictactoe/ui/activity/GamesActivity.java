@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.donky.tictactoe.R;
+import com.donky.tictactoe.model.GameSessionController;
 import com.donky.tictactoe.model.Invite;
 import com.donky.tictactoe.tictactoe.GameManager;
 import com.donky.tictactoe.tictactoe.GameSession;
@@ -90,11 +91,11 @@ public class GamesActivity extends Activity implements AddGameDialog.OnUserInvit
 
     @Override
     public void onInviteSend() {
-
+        mGamesListFragment.notifyAdapter();
     }
 
     @Override
-    public void onCreateGame(GameSession gameSession) {
+    public void onCreateGame() {
         mGamesListFragment.notifyAdapter();
     }
 
@@ -112,7 +113,7 @@ public class GamesActivity extends Activity implements AddGameDialog.OnUserInvit
     }
 
     @Override
-    public void onFinishGame(GameSession gameSession) {
+    public void onFinishGame() {
 
     }
 
