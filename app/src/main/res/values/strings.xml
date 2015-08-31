@@ -15,7 +15,7 @@
     <string name="player1_win">You win!</string>
     <string name="tie">This is a tie! No one wins!</string>
     <string name="player2_turn">Player 2\'s turn (that\'s not you)</string>
-    <string name="player1_turn">Player 1\'s turn -- that\'s you!</string>
+    <string name="player1_turn">Your turn!</string>
 
     <string name="start_comp">Start -- Player 2 goes first</string>
     <string name="start_player">Start -- Player goes first</string>

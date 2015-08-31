@@ -43,7 +43,7 @@ public class LoginFragment extends BaseFragment {
         if (userId != null && displayName != null){
             mLoginButton.setVisibility(View.GONE);
             mProgressBar.setVisibility(View.VISIBLE);
-            goToGameActvity();
+            goToGameActivity();
         }else {
             mLoginContent.setVisibility(View.VISIBLE);
             mLoginButton.setVisibility(View.VISIBLE);
@@ -70,7 +70,7 @@ public class LoginFragment extends BaseFragment {
         AppTicTakToe.getsAppTicTakToe().updateUserDetails(user, new CallBack() {
             @Override
             public void success(Object response) {
-                goToGameActvity();
+                goToGameActivity();
             }
 
             @Override
@@ -83,7 +83,7 @@ public class LoginFragment extends BaseFragment {
         });
     }
 
-    private void goToGameActvity(){
+    private void goToGameActivity(){
         Intent intent = new Intent(getActivity(), GamesActivity.class);
         startActivity(intent);
         getActivity().finish();

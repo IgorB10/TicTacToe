@@ -11,7 +11,7 @@ import com.donky.tictactoe.R;
 import com.donky.tictactoe.model.GameSessionController;
 import com.donky.tictactoe.model.Move;
 import com.donky.tictactoe.tictactoe.Game;
-import com.donky.tictactoe.tictactoe.GameMoves;
+import com.donky.tictactoe.tictactoe.GameMovesListener;
 import com.donky.tictactoe.ui.activity.GamesActivity;
 import com.donky.tictactoe.ui.view.GameView;
 
@@ -23,12 +23,6 @@ public class GameFragment extends BaseFragment {
 
     @Bind(R.id.game_view) Game mGameView;
     @Bind(R.id.info_turn) TextView mInfoView;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-    }
 
     @Nullable
     @Override
@@ -44,15 +38,21 @@ public class GameFragment extends BaseFragment {
         mGameSessionController = ((GamesActivity)getActivity()).mGameManager.getGameSession(position);
         mGameView.onStartGame(mGameSessionController.getStates());
         if (mGameSessionController.getLastMovedPlayer() == GameView.State.EMPTY)
-        selectTurn(mGameSessionController.isMyFirstMove() ? GameView.State.PLAYER1
+            selectTurn(mGameSessionController.isMyFirstMove() ? GameView.State.PLAYER1
                 : GameView.State.PLAYER2);
         else
-            selectTurn(mGameSessionController.getLastMovedPlayer());
+            selectTurn(mGameSessionController.getCurrentMove());
         mGameView.setOnCellSelectedListener(new MyCellListener());
-        mGameSessionController.setGameMoves(new GameMoves() {
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mGameSessionController.setGameMovesListener(new GameMovesListener() {
             @Override
             public void move(Move move) {
-
+                mGameView.setCell(move.getPosition(), GameView.State.PLAYER1);
             }
 
             @Override
@@ -62,6 +62,12 @@ public class GameFragment extends BaseFragment {
                 finishTurn();
             }
         });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mGameSessionController.removeGameMovesListener();
     }
 
     private GameView.State selectTurn(GameView.State player) {
@@ -86,7 +92,6 @@ public class GameFragment extends BaseFragment {
             } else if (player == GameView.State.PLAYER1) {
                 int cell = mGameView.getSelection();
                 if (cell >= 0) {
-                    mGameView.setCell(cell, player);
                     mGameSessionController.sendMove(cell);
                     finishTurn();
                 }
@@ -101,7 +106,7 @@ public class GameFragment extends BaseFragment {
     private void finishTurn() {
         GameView.State player = mGameView.getCurrentState();
         if (!checkGameFinished(player)) {
-            player = selectTurn(getOtherPlayer(player));
+            selectTurn(getOtherPlayer(player));
         }
     }
 

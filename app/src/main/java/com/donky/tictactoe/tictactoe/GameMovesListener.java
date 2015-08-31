@@ -2,7 +2,7 @@ package com.donky.tictactoe.tictactoe;
 
 import com.donky.tictactoe.model.Move;
 
-public interface GameMoves {
+public interface GameMovesListener {
 
     void move(Move move);
 

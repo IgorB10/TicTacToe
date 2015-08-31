@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.donky.tictactoe.AppTicTakToe;
 import com.donky.tictactoe.R;
 import com.donky.tictactoe.model.Invite;
 
@@ -26,7 +28,11 @@ public class AddGameDialog extends DialogFragment {
                 .setPositiveButton(R.string.send_invite, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (getActivity() instanceof OnUserInviteListener)
+                        String opponentId = mEditTextUserId.getEditableText().toString();
+                        if (opponentId.equals(AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId()))
+                            Toast.makeText(getActivity(), "You can't play with youeself! Try another name", Toast.LENGTH_LONG).show();
+                        else
+                            if (getActivity() instanceof OnUserInviteListener)
                             ((OnUserInviteListener)getActivity())
                                     .sendInvite(mEditTextUserId.getEditableText().toString());
                     }

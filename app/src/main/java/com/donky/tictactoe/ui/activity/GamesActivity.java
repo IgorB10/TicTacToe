@@ -1,20 +1,16 @@
 package com.donky.tictactoe.ui.activity;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.donky.tictactoe.R;
-import com.donky.tictactoe.model.GameSessionController;
 import com.donky.tictactoe.model.Invite;
 import com.donky.tictactoe.tictactoe.GameManager;
-import com.donky.tictactoe.tictactoe.GameSession;
 import com.donky.tictactoe.ui.dialog.AddGameDialog;
 import com.donky.tictactoe.ui.dialog.InviteDialog;
 import com.donky.tictactoe.ui.fragment.GameFragment;
@@ -31,7 +27,6 @@ public class GamesActivity extends Activity implements AddGameDialog.OnUserInvit
     private GameFragment mGameFragment;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +38,7 @@ public class GamesActivity extends Activity implements AddGameDialog.OnUserInvit
         }
         mGameManager = new GameManager(this);
         mGamesListFragment.setSession(mGameManager.getGameSessions());
-        mGamesListFragment.setmSessionSelectedListener(this);
+        mGamesListFragment.setSessionSelectedListener(this);
     }
 
     @Override
@@ -121,7 +116,6 @@ public class GamesActivity extends Activity implements AddGameDialog.OnUserInvit
     public void sessionPosition(int position) {
         if (mGameFragment == null)
             mGameFragment = new GameFragment();
-        //FIXME
         Bundle bundle = new Bundle();
         bundle.putInt(EXTRA_SELECTED_SESION, position);
         mGameFragment.setArguments(bundle);

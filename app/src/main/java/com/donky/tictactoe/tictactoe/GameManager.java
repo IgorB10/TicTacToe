@@ -55,7 +55,7 @@ public class GameManager implements InviteNotificationManager.OnInviteListener {
 
     private void createGameSession(Invite invite){
         GameSessionController gameSession = getSessionByInvite(invite);
-        gameSession.setmGameState(GameSessionController.GameState.PLAYING);
+        gameSession.setGameState(GameSessionController.GameState.PLAYING);
         mSendInvited.remove(invite);
         mGame.onCreateGame();
     }

@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.donky.tictactoe.R;
 import com.donky.tictactoe.model.GameSessionController;
@@ -67,7 +68,13 @@ public class GamesListFragment extends BaseFragment {
         mSessionGamesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mSessionSelectedListener.sessionPosition(position);
+                GameSessionController.GameState state = mGamesListAdapter.getItem(position).getGameState();
+                if (state == GameSessionController.GameState.STARTING)
+                    Toast.makeText(getActivity(), "Please wait, game will start in a minute", Toast.LENGTH_LONG).show();
+                else if (state == GameSessionController.GameState.FINISH)
+                    Toast.makeText(getActivity(), "This game is finish", Toast.LENGTH_LONG).show();
+                else
+                    mSessionSelectedListener.sessionPosition(position);
             }
         });
     }
@@ -80,7 +87,7 @@ public class GamesListFragment extends BaseFragment {
         mGamesListAdapter.notifyDataSetChanged();
     }
 
-    public void setmSessionSelectedListener(OnSessionSelectedListener mSessionSelectedListener) {
+    public void setSessionSelectedListener(OnSessionSelectedListener mSessionSelectedListener) {
         this.mSessionSelectedListener = mSessionSelectedListener;
     }
 
@@ -101,7 +108,6 @@ public class GamesListFragment extends BaseFragment {
                 viewHolder = new ViewHolder(convertView);
                 convertView.setTag(viewHolder);
             }
-            convertView.setClickable(true);
             final GameSessionController sessionController = getItem(position);
             if (sessionController.getGameState() == GameSessionController.GameState.STARTING){
                 viewHolder.content.setText(getString(R.string.starting_game_with) + sessionController.getOpponentName());
@@ -111,7 +117,6 @@ public class GamesListFragment extends BaseFragment {
                 viewHolder.progressGame.setVisibility(View.INVISIBLE);
             }else if (sessionController.getGameState() == GameSessionController.GameState.FINISH){
                 viewHolder.content.setText(getString(R.string.finish_game));
-                convertView.setClickable(false);
                 viewHolder.progressGame.setVisibility(View.INVISIBLE);
             }
             return convertView;

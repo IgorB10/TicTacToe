@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="fab_color">#4A148C</color>
-
-    <color name="fab_output">#8E24AA</color>
+    <color name="fab_color">#8E24AA</color>
 
 
     <!--Grey colors-->

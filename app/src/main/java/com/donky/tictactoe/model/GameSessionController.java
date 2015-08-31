@@ -3,7 +3,7 @@ package com.donky.tictactoe.model;
 import android.widget.Toast;
 
 import com.donky.tictactoe.AppTicTakToe;
-import com.donky.tictactoe.tictactoe.GameMoves;
+import com.donky.tictactoe.tictactoe.GameMovesListener;
 import com.donky.tictactoe.tictactoe.GameSession;
 import com.donky.tictactoe.ui.view.GameView;
 import com.google.gson.Gson;
@@ -25,11 +25,11 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class GameSessionController implements GameMoves, NotificationListener<ServerNotification> {
+public class GameSessionController implements NotificationListener<ServerNotification> {
 
     private GameSession mGameSession;
     private GameState mGameState;
-    private GameMoves mGameMoves;
+    private GameMovesListener mGameMovesListener;
 
     private GameView.State winPlayer = GameView.State.EMPTY;
 
@@ -50,11 +50,15 @@ public class GameSessionController implements GameMoves, NotificationListener<Se
         DonkyCore.subscribeToContentNotifications(moduleDefinition, subscription);
     }
 
-    public void setGameMoves(GameMoves mGameMoves) {
-        this.mGameMoves = mGameMoves;
+    public void setGameMovesListener(GameMovesListener mGameMovesListener) {
+        this.mGameMovesListener = mGameMovesListener;
     }
 
-    public void setmGameState(GameState gameState) {
+    public void removeGameMovesListener(){
+        this.mGameMovesListener = null;
+    }
+
+    public void setGameState(GameState gameState) {
         this.mGameState = gameState;
     }
 
@@ -84,14 +88,9 @@ public class GameSessionController implements GameMoves, NotificationListener<Se
         mGameState = GameState.FINISH;
     }
 
-    @Override
-    public void move(Move move) {
-
-    }
-
-    @Override
-    public void receive(Move move) {
-
+    public GameView.State getCurrentMove(){
+        return lastMovedPlayer == GameView.State.PLAYER1
+                ? GameView.State.PLAYER2 : GameView.State.PLAYER1;
     }
 
     private void setState(int position, GameView.State player){
@@ -117,18 +116,25 @@ public class GameSessionController implements GameMoves, NotificationListener<Se
         if ((AppTicTakToe.getsAppTicTakToe().getPreferencesManager().getUserId() + "_" + mGameSession.getmInvite().getGameId()).equals(type)) {
             Gson gson = new GsonBuilder().create();
             Move move = gson.fromJson(data.get("customData"), Move.class);
-            if (mGameMoves != null && getState(move.getPosition()) == GameView.State.EMPTY) {
-                lastMovedPlayer = GameView.State.PLAYER2;
-                mGameMoves.receive(move);
+            lastMovedPlayer = GameView.State.PLAYER2;
+            if (mGameMovesListener != null && getState(move.getPosition()) == GameView.State.EMPTY) {
+                mGameMovesListener.receive(move);
+            }else if (getState(move.getPosition()) == GameView.State.EMPTY){
+                setState(move.getPosition(), GameView.State.PLAYER2);
             }
         }
     }
 
     public void sendMove(int position){
-        sendMove(new Move(position));
+        Move move = new Move(position);
+        if (mGameMovesListener != null)
+            mGameMovesListener.move(move);
+        sendMove(move);
     }
 
     private void sendMove(final Move move){
+
+
         String jsonString = new Gson().toJson(move);
         JSONObject jsonObject = null;
         try {
@@ -146,7 +152,6 @@ public class GameSessionController implements GameMoves, NotificationListener<Se
                 new DonkyListener(){
                     @Override
                     public void success() {
-                        setState(move.getPosition(), GameView.State.PLAYER1);
                         lastMovedPlayer = GameView.State.PLAYER1;
                         Toast.makeText(AppTicTakToe.getsAppTicTakToe(), "success move", Toast.LENGTH_LONG).show();
                     }
@@ -156,5 +161,21 @@ public class GameSessionController implements GameMoves, NotificationListener<Se
                         Toast.makeText(AppTicTakToe.getsAppTicTakToe(), e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GameSessionController that = (GameSessionController) o;
+
+        return !(mGameSession != null ? !mGameSession.equals(that.mGameSession) : that.mGameSession != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return mGameSession != null ? mGameSession.hashCode() : 0;
     }
 }
