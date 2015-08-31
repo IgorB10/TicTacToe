@@ -32,8 +32,6 @@ public class GameSession implements NotificationListener<ServerNotification> {
     private State[] states;
     private State lastMove;
 
-
-    private GameFragment gameFragment;
     private GameMoves mGameMoves;
 
     public GameSession(Invite invite){
@@ -53,7 +51,7 @@ public class GameSession implements NotificationListener<ServerNotification> {
             Gson gson = new GsonBuilder().create();
             Move move = gson.fromJson(data.get("customData"), Move.class);
             states[move.getPosition()] = State.PLAYER2;
-            if (mGameMoves != null)
+            if (mGameMoves != null && states[move.getPosition()] == State.EMPTY)
                 mGameMoves.receive(move);
         }
     }
@@ -66,24 +64,9 @@ public class GameSession implements NotificationListener<ServerNotification> {
         this.lastMove = lastMove;
     }
 
-    public void setGameFragment(GameFragment gameFragment) {
-        this.gameFragment = gameFragment;
-    }
-
     public void setGameMoves(GameMoves mGameMoves) {
         this.mGameMoves = mGameMoves;
     }
-
-//    @Override
-//    public void move(Move move) {
-//        sendMove(move);
-//    }
-//
-//    @Override
-//    public void receive(Move move) {
-//        states[move.getPosition()] = State.PLAYER2;
-//        gameFragment.update();
-//    }
 
     public Invite getmInvite() {
         return mInvite;

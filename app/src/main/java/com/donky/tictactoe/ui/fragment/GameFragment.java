@@ -55,7 +55,6 @@ public class GameFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         int position = getArguments().getInt(GamesActivity.EXTRA_SELECTED_SESION);
         mGameSession = ((GamesActivity)getActivity()).mGameManager.getGameSession(position);
-        mGameSession.setGameFragment(this);
         mGameView.onStartGame(mGameSession.getStates());
         //FIXME
 //        if (mGameSession.getLastMove() == null)
